@@ -1,0 +1,24 @@
+=== SEEDED DATA IDs ===
+
+ORGANIZATIONS:
+  Sterling Engineering & Construction Ltd: bc879471-4634-4aee-bd97-b557cdf97e86
+  Red Cross Nigeria: 5ff08e6e-c255-42dd-aacb-61fe0b4aa992
+  Doctors Without Borders - Nigeria: 766485e3-f176-4302-ba7b-2510dd932944
+  Save the Children International: 8a0fab17-15ea-4d0c-8b63-921fdbc61e0e
+  World Food Programme Nigeria: c2f6c52f-8c50-4573-920c-7c045cb16d98
+  Green Earth Initiative: 1701192f-7167-4e99-a8a2-6fa5d44675ee
+
+PROJECTS:
+  Lagos-Ibadan Expressway Phase 2: b5e874e6-072b-40c2-98f7-446aa4937b50
+  Eko Atlantic City - Phase 3: 9d72b483-0d50-43c6-bcdd-dfaf39a55daa
+  Abuja Light Rail Project - Phase 1: 9b978b15-a062-4d02-a4b1-e32e614f710e
+  North-East Emergency Response - IDP Camps: 7933bfbc-4bee-448e-ac52-0e546ef4905e
+  Maternal and Child Health Program: 6c1a2a8f-426e-4701-a0c4-7b97730dacc1
+  North-East Emergency Response - IDP Camps: 24942d2a-6ecc-411e-bad7-e3444a16f04c
+  Maternal and Child Health Program: 40789981-74f0-4a82-b95b-d5ad7681d61d
+  North-East Emergency Response - IDP Camps: 34b026d2-09a7-4066-a182-342460362293
+  Maternal and Child Health Program: 31e3e871-0adc-4355-8107-927ed42076dd
+  North-East Emergency Response - IDP Camps: f70815b4-099d-46c8-93a6-af119b2fa08a
+  Maternal and Child Health Program: 9e86cc84-ac43-4e86-9730-60be3def338b
+  North-East Emergency Response - IDP Camps: 95ef0dc9-d57f-4bb6-9d84-839b2c82771d
+  Maternal and Child Health Program: 928dd820-1db7-483a-8584-19a538688d7d

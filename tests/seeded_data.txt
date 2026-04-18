@@ -1,0 +1,50 @@
+=== SEEDED DATA IDs ===
+
+ORGANIZATIONS:
+  Red Cross Nigeria: 6f67c043-2eb4-43eb-beb3-a21d11a60091
+  Doctors Without Borders - Nigeria: c2b71a87-c711-4ca5-bd0d-96c27db3027b
+  Save the Children International: 21600522-730b-4f2f-9ca3-f0c15aa36923
+  World Food Programme Nigeria: d0cfc4c9-bcd6-4f96-b539-5a4cb8c4501b
+  Green Earth Initiative: 5320dd50-4912-4e47-a555-660ef6a3b7d9
+
+PROJECTS:
+  Emergency Flood Response - Lagos: 0bd3a8a7-db63-4bb0-9f03-b61116964c6b
+  Community Health Outreach Program: 6084fce0-7568-43ef-8b04-452aad9d02c6
+  Disaster Preparedness Training: 7396afe2-3167-4266-9246-86b73b7e4131
+  Blood Donation Campaign: 993f4105-f6ea-46cd-8436-012d95c56d96
+  Shelter Construction for IDPs: 827ac9b5-7905-4129-af66-900d89061c36
+  Water Sanitation and Hygiene (WASH): 4d8652fa-9e30-4f81-bab2-0129aaaa81cd
+  Food Distribution Program: 3bbea77e-ceaf-4d95-ab36-5d60535bbc4a
+  Emergency Response Vehicle Fleet: 1d216921-47d7-449b-9709-6ee2235c85b7
+  Malaria Prevention Campaign: 8e65f042-6dbd-4a7f-be4d-2ca6316ae6cd
+  Mobile Health Clinics: d97cdd90-f44b-4ea8-88f7-163ed648e0f3
+  COVID-19 Vaccination Drive: 7e4d6a1a-9b64-4f84-8485-f0630f6e0731
+  Maternal Health Program: 795d725b-4045-4e82-96d1-19f19ab1ca62
+  Nutritional Support for Children: 7eb09308-c356-44bf-b074-bbad5f2e3812
+  Emergency Surgery Unit: f249618f-74dd-43f5-9129-ba1d026c5da5
+  Mental Health Support Services: b1b97e2a-34ef-4be1-baf7-8f6288fe9b4e
+  Disease Surveillance System: 0515e6c4-7fc0-4af5-9f9f-c5f561c97929
+  Back to School Program: d5bb4dd6-b0ac-45f9-b850-953bfd8398f7
+  Child Protection Centers: 18044ad5-e89f-4bc3-86e6-e29b178866fc
+  Early Childhood Development: af58ab93-5656-478c-843e-df39b9fc9170
+  Nutrition for Under-5 Children: 31cbe2db-08c3-4efc-9e2f-a5dfe9998c9a
+  Education in Emergencies: 76bba8f9-ac3d-4670-9d3c-7b5525049270
+  Child Rights Advocacy: 40c14dc9-186c-44e5-ab1e-1a60620cdeb9
+  Safe Spaces for Children: c2ee9164-5b52-4618-bf07-03d523e80362
+  Vocational Training for Youth: 4356857b-c7c6-476c-996c-1d705f4c7222
+  School Feeding Program: ec281365-9f89-4982-82bc-a100f1b08f4b
+  Emergency Food Assistance: cc9fd55f-9e9d-4aec-a2d4-80fb2c300488
+  Nutrition Smart Agriculture: 42698cb4-c99e-4e61-85cb-a2ab882a0462
+  Food Storage Facilities: 95562c6e-1247-48ca-b4e0-67fa6a8a3b31
+  Cash Transfer Program: 464e9798-98e8-44a8-97f3-fd2a8ad22c6d
+  Community Resilience Building: 849d058f-d2a5-445d-8799-bb66d10a979d
+  Supply Chain Optimization: 4a6dba1c-338c-4d91-be60-b87277cd5440
+  Nutrition Monitoring System: 683b2d96-8564-43a6-beb0-64355db63989
+  Tree Planting Campaign: 51f21e4b-ca21-4d05-b1cf-8815fb98184a
+  Plastic Waste Recycling Project: 4cb6fd40-6f5e-406a-8800-2b7877e22555
+  Renewable Energy for Communities: 99567532-ec74-40a2-b87c-f5f4c5f3de89
+  Climate Change Awareness: 666e791b-15c7-4c87-b876-caa7f39b4447
+  Urban Gardening Program: c4573afe-4a9f-4fb4-a760-52fdc6f2bac1
+  Clean Water Initiative: e84f3e71-4d51-4546-a00e-3ff93cef7f78
+  Eco-Tourism Development: d42e64e5-e7b2-4f6d-b3ec-78d75665debc
+  Environmental Education: 9881e234-1e0f-46fe-811f-c5efa62eb746
