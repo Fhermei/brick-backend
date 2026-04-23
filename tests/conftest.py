@@ -1,52 +1,107 @@
 """
-Pytest configuration for testing running server
+Pytest configuration file with shared fixtures for testing
 """
 
 import pytest
-from tests.global_session import get_global_session, BASE_URL
+import requests
+import uuid
+import time
+
+BASE_URL = "http://localhost:8000/api/v1"
+TEST_EMAIL = "oyewoleoluwafemidavid1@gmail.com"
+TEST_PASSWORD = "Fatunbi11."
 
 
 @pytest.fixture(scope="session")
-def session():
-    """Authenticated session for all tests"""
-    return get_global_session()
-
-
-@pytest.fixture(scope="session")
-def base_url():
-    """Base URL for API"""
-    return BASE_URL
-
-
-@pytest.fixture(scope="session")
-def test_org_id(base_url):
-    """Get or create a test organization ID (session scope)"""
-    session = get_global_session()
+def auth_session():
+    """Create authenticated session for all tests"""
+    session = requests.Session()
     
-    # First try to get existing orgs
-    response = session.get(f"{base_url}/organizations/mine")
+    login_data = {"email": TEST_EMAIL, "password": TEST_PASSWORD}
     
-    if response.status_code == 200:
-        orgs = response.json().get("organizations", [])
-        if orgs:
-            org_id = orgs[0]["id"]
-            print(f"\n✅ Using existing organization: {org_id}")
-            return org_id
+    response = session.post(f"{BASE_URL}/auth/login", json=login_data)
+    
+    if response.status_code != 200:
+        pytest.fail(f"Login failed: {response.status_code} - {response.text}")
+    
+    # Verify cookies are set
+    if not session.cookies.get("access_token"):
+        pytest.fail("Access token cookie not set after login")
+    
+    return session
+
+
+@pytest.fixture(scope="session")
+def test_org(auth_session):
+    """Get or create test organization"""
+    response = auth_session.get(f"{BASE_URL}/organizations/mine")
+    
+    if response.status_code != 200:
+        pytest.fail(f"Could not fetch organizations: {response.status_code} - {response.text}")
+    
+    orgs = response.json().get("organizations", [])
+    
+    if orgs:
+        return orgs[0]
     
     # Create new org if none exists
     org_data = {
-        "name": "Test Organization",
-        "industry": "Technology",
+        "name": f"Test NGO Organization {uuid.uuid4().hex[:8]}",
+        "industry": "NGO / Non-profit",
         "currency": "USD",
         "timezone": "Africa/Lagos"
     }
     
-    create_response = session.post(f"{base_url}/organizations/", json=org_data)
+    response = auth_session.post(f"{BASE_URL}/organizations/", json=org_data)
     
-    if create_response.status_code == 201:
-        org_id = create_response.json()["id"]
-        print(f"\n✅ Created test organization: {org_id}")
-        return org_id
+    if response.status_code != 201:
+        pytest.fail(f"Could not create organization: {response.status_code} - {response.text}")
     
-    pytest.skip("Could not create or find test organization")
-    return None
+    return response.json()
+
+
+@pytest.fixture(scope="session")
+def test_project(auth_session, test_org):
+    """Create test project"""
+    project_data = {
+        "title": f"Test NGO Project {uuid.uuid4().hex[:8]}",
+        "description": "Providing clean water to rural communities",
+        "status": "active",
+        "start_date": "2026-01-01",
+        "end_date": "2026-12-31",
+        "total_budget": 5000000,
+        "currency": "USD"
+    }
+    
+    response = auth_session.post(
+        f"{BASE_URL}/projects?org_id={test_org['id']}",
+        json=project_data
+    )
+    
+    if response.status_code != 201:
+        pytest.fail(f"Could not create project: {response.status_code} - {response.text}")
+    
+    return response.json()
+
+
+@pytest.fixture(scope="session")
+def test_task(auth_session, test_project):
+    """Create test task"""
+    task_data = {
+        "title": f"Conduct community needs assessment {uuid.uuid4().hex[:8]}",
+        "description": "Survey households for water needs",
+        "type": "research",
+        "priority": "high",
+        "due_date": "2026-06-30",
+        "budget_allocated": 500000
+    }
+    
+    response = auth_session.post(
+        f"{BASE_URL}/tasks?project_id={test_project['id']}",
+        json=task_data
+    )
+    
+    if response.status_code != 201:
+        pytest.fail(f"Could not create task: {response.status_code} - {response.text}")
+    
+    return response.json()

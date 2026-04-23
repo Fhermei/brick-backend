@@ -1,0 +1,13 @@
+=== SAVED THE CHILDREN INTERNATIONAL - SEEDED DATA ===
+
+Organization ID: e47694d7-efef-4012-ad6b-1a63f8508708
+
+PROJECTS:
+  Emergency Nutrition Response - Northeast Nigeria: 1ebbdefc-f866-4d3d-b3e2-b15c7bcbe375
+  Girls Education Access Project - Kano State: fd7de3fe-c0ab-4b6c-b33f-fcd9f6cfcdde
+  Child Protection and Psychosocial Support - IDP Camps: 796b9c27-daf7-47d8-a71a-84eb9d61753d
+  Maternal and Newborn Health - Adamawa State: 28eaf1be-f1b3-4bec-a8c0-3245e22832d9
+  Water, Sanitation and Hygiene (WASH) - Rural Communities: 8238f40a-6f31-49cd-b1e4-a9004abd1497
+
+Total Projects: 5
+Total Tasks: 478
