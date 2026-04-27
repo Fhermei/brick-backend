@@ -1,0 +1,12 @@
+=== SUPABASE SEEDED DATA IDs ===
+
+ORGANIZATION:
+  Name: Save the Children International - Nigeria
+  ID: 04d21349-55e6-4e41-9326-d1a0fd89047c
+
+PROJECTS:
+  Emergency Nutrition Response - Northeast Nigeria: 95a93f55-22cb-4aee-9f68-3393fc077ac9
+  Girls Education Access Project - Kano State: a2dc5deb-5133-4c0e-861a-1ecd6dd60607
+  Child Protection and Psychosocial Support - IDP Camps: c32ce266-d4f6-4fa6-ba03-ef7bbc070f04
+  Maternal and Newborn Health - Adamawa State: 3d38e2ef-ba59-40ed-b3fd-ebc5d220a7e9
+  Water, Sanitation and Hygiene (WASH) - Rural Communities: 962e4ae1-b83c-4c8f-9497-1a3b1f55b037

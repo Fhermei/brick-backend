@@ -8,13 +8,23 @@
   ],
   "routes": [
     {
+      "src": "/api/v1/(.*)",
+      "dest": "src/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "src/main.py",
+      "methods": ["OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie, Set-Cookie, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "src/main.py"
     }
-  ],
-  "env": {
-    "APP_NAME": "Brick SPMES API",
-    "APP_VERSION": "1.0.0",
-    "DEBUG": "False"
-  }
+  ]
 }

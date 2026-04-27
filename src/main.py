@@ -17,27 +17,21 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Configure CORS properly for all endpoints including reports
+# CORS configuration - MUST be before routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:3000",
         "https://brick-frontend-beige.vercel.app",
-        "https://brick-frontend-1d3rb52bw-femis-projects-21e38439.vercel.app",
-    ], 
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=[
-        "Content-Type",
-        "Set-Cookie",
-        "Cookie",
-        "Authorization",
-        "Accept",
-        "X-Requested-With"
+        "https://brick-frontend-git-main-femis-projects-21e38439.vercel.app",
+        "https://brick-frontend-*.vercel.app",
     ],
-    expose_headers=["Set-Cookie"],
-    max_age=3600,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],
+    max_age=86400,
 )
 
 
@@ -53,6 +47,11 @@ def root():
         "version": settings.APP_VERSION,
         "docs": "/docs",
     }
+
+
+@app.options("/{rest_of_path:path}")  # Handle preflight requests
+async def preflight_handler():
+    return Response(status_code=200)
 
 
 app.include_router(v1_router, prefix="/api/v1")

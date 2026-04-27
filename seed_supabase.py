@@ -1,10 +1,9 @@
 """
-Complete Supabase Seed Script for Save the Children International
-Populates all tables with realistic NGO data
+Complete Supabase Seed Script for All NGOs
+Seeds: International Rescue Committee, CARE International, Oxfam, Plan International, ActionAid
 """
 
 import os
-import sys
 import uuid
 import random
 from datetime import datetime, timedelta
@@ -19,419 +18,365 @@ from src.models.project import Project, ProjectMember
 from src.models.task import Task, TaskAssignee
 from src.models.expense import Expense
 from src.models.kpi import KPI
-from src.models.comment import Comment
-from src.models.notification import Notification
 
 
 def create_tables():
-    """Create all tables in Supabase"""
-    from src.db.session import Base, engine
-    print("Creating tables in Supabase...")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    print("Tables created successfully!\n")
+    """Tables already exist, just verify"""
+    print("Tables already created. Proceeding with seeding...")
 
 
-def seed_save_the_children():
-    """Seed Save the Children International complete data"""
+def seed_all_ngos():
+    """Seed all NGO organizations"""
     db = SessionLocal()
     
     try:
         print("=" * 80)
-        print("SEEDING SAVE THE CHILDREN INTERNATIONAL - NIGERIA")
+        print("SEEDING ALL NGO ORGANIZATIONS")
         print("=" * 80)
         
         # ============================================================
-        # STEP 1: CREATE ORGANIZATION
+        # STEP 1: CREATE ADMIN USER (will be owner of all orgs)
         # ============================================================
-        print("\n[1] Creating Organization...")
-        org = Organization(
-            id=uuid.uuid4(),
-            name="Save the Children International - Nigeria",
-            industry="NGO / Non-profit",
-            currency="USD",
-            timezone="Africa/Lagos",
-            is_active=True
-        )
-        db.add(org)
-        db.flush()
-        print(f"    ✅ Created: {org.name}")
-        print(f"       ID: {org.id}")
+        print("\n[1] Creating Admin User...")
         
-        # ============================================================
-        # STEP 2: CREATE USERS (10 Team Members)
-        # ============================================================
-        print("\n[2] Creating Team Members...")
-        users = []
-        team_data = [
-            {"name": "Dr. Aisha Mohammed", "email": "aisha.mohammed@savethechildren.org", "role": "owner"},
-            {"name": "Ibrahim Bello", "email": "ibrahim.bello@savethechildren.org", "role": "admin"},
-            {"name": "Fatima Usman", "email": "fatima.usman@savethechildren.org", "role": "manager"},
-            {"name": "Samuel Okonkwo", "email": "samuel.okonkwo@savethechildren.org", "role": "manager"},
-            {"name": "Grace Emmanuel", "email": "grace.emmanuel@savethechildren.org", "role": "member"},
-            {"name": "James Nwachukwu", "email": "james.nwachukwu@savethechildren.org", "role": "member"},
-            {"name": "Patience Adamu", "email": "patience.adamu@savethechildren.org", "role": "member"},
-            {"name": "Daniel Okafor", "email": "daniel.okafor@savethechildren.org", "role": "member"},
-            {"name": "Esther Ogunleye", "email": "esther.ogunleye@savethechildren.org", "role": "member"},
-            {"name": "Emmanuel Okafor", "email": "emmanuel.okafor@savethechildren.org", "role": "viewer"}
-        ]
-        
-        for idx, member in enumerate(team_data):
-            user = User(
+        # Check if admin already exists
+        existing_admin = db.query(User).filter(User.email == "admin@brick.org").first()
+        if existing_admin:
+            admin = existing_admin
+            print(f"    ✅ Admin already exists: {admin.name}")
+        else:
+            admin = User(
                 id=uuid.uuid4(),
-                name=member["name"],
-                email=member["email"],
+                name="System Administrator",
+                email="admin@brick.org",
                 is_active=True,
                 is_verified=True
             )
-            db.add(user)
+            db.add(admin)
             db.flush()
-            users.append({"user": user, "role": member["role"]})
-            print(f"    ✅ {member['name']} ({member['role']})")
+            print(f"    ✅ Created Admin: {admin.name} (ID: {admin.id})")
         
         # ============================================================
-        # STEP 3: ADD USERS TO ORGANIZATION
+        # STEP 2: ORGANIZATIONS DATA
         # ============================================================
-        print("\n[3] Adding Members to Organization...")
-        for u in users:
-            org_member = OrgMember(
-                id=uuid.uuid4(),
-                org_id=org.id,
-                user_id=u["user"].id,
-                role=u["role"],
-                status="active"
-            )
-            db.add(org_member)
+        print("\n[2] Creating NGO Organizations...")
+        
+        organizations_data = [
+            {
+                "name": "International Rescue Committee Nigeria",
+                "industry": "NGO / Non-profit",
+                "currency": "USD",
+                "timezone": "Africa/Lagos"
+            },
+            {
+                "name": "CARE International Nigeria",
+                "industry": "NGO / Non-profit",
+                "currency": "USD",
+                "timezone": "Africa/Lagos"
+            },
+            {
+                "name": "Oxfam Nigeria",
+                "industry": "NGO / Non-profit",
+                "currency": "USD",
+                "timezone": "Africa/Lagos"
+            },
+            {
+                "name": "Plan International Nigeria",
+                "industry": "NGO / Non-profit",
+                "currency": "USD",
+                "timezone": "Africa/Lagos"
+            },
+            {
+                "name": "ActionAid Nigeria",
+                "industry": "NGO / Non-profit",
+                "currency": "NGN",
+                "timezone": "Africa/Lagos"
+            }
+        ]
+        
+        organizations = []
+        for org_data in organizations_data:
+            # Check if organization already exists
+            existing_org = db.query(Organization).filter(Organization.name == org_data["name"]).first()
+            if existing_org:
+                org = existing_org
+                print(f"    ⏭️  Already exists: {org.name}")
+            else:
+                org = Organization(
+                    id=uuid.uuid4(),
+                    name=org_data["name"],
+                    industry=org_data["industry"],
+                    currency=org_data["currency"],
+                    timezone=org_data["timezone"],
+                    owner_id=admin.id,
+                    is_active=True
+                )
+                db.add(org)
+                db.flush()
+                print(f"    ✅ Created: {org.name}")
+            
+            organizations.append(org)
+            
+            # Add admin as owner to organization
+            existing_member = db.query(OrgMember).filter(
+                OrgMember.org_id == org.id,
+                OrgMember.user_id == admin.id
+            ).first()
+            if not existing_member:
+                org_member = OrgMember(
+                    id=uuid.uuid4(),
+                    org_id=org.id,
+                    user_id=admin.id,
+                    role="owner",
+                    status="active"
+                )
+                db.add(org_member)
+        
         db.flush()
-        print(f"    ✅ Added {len(users)} members to organization")
+        print(f"\n    Total organizations: {len(organizations)}")
         
         # ============================================================
-        # STEP 4: CREATE 5 NGO PROJECTS
+        # STEP 3: PROJECTS AND TASKS FOR EACH ORGANIZATION
         # ============================================================
-        print("\n[4] Creating Projects...")
+        print("\n[3] Creating Projects and Tasks...")
         
+        # Project templates for NGOs
         project_templates = [
             {
-                "title": "Emergency Nutrition Response - Northeast Nigeria",
-                "description": "Treating acute malnutrition in children under five across Borno, Adamawa and Yobe states. Project includes community-based screening, outpatient therapeutic feeding, and maternal nutrition education.",
-                "total_budget": 4250000,
-                "status": "active",
-                "start_date": datetime.now() - timedelta(days=120),
-                "end_date": datetime.now() + timedelta(days=240),
-                "actual_spent": 1850000,
+                "title": "Emergency Food Security Response",
+                "description": "Providing emergency food assistance to 10,000 households",
+                "budget": 2500000,
+                "duration_months": 12,
+                "tasks": [
+                    {"title": "Rapid needs assessment", "priority": "urgent", "type": "research", "budget": 45000},
+                    {"title": "Food distribution planning", "priority": "high", "type": "task", "budget": 25000},
+                    {"title": "Procurement of food supplies", "priority": "high", "type": "task", "budget": 200000},
+                    {"title": "Beneficiary registration", "priority": "high", "type": "task", "budget": 50000},
+                    {"title": "Food distribution execution", "priority": "high", "type": "task", "budget": 150000},
+                    {"title": "Post-distribution monitoring", "priority": "medium", "type": "research", "budget": 35000}
+                ],
                 "kpis": [
-                    {"name": "Children screened for malnutrition", "target": 25000, "current": 14200, "unit": "children"},
-                    {"name": "Children admitted to treatment", "target": 15000, "current": 8750, "unit": "children"},
-                    {"name": "Recovery rate", "target": 85, "current": 78, "unit": "%"},
-                    {"name": "Default rate", "target": 5, "current": 7, "unit": "%"},
-                    {"name": "Mothers reached with nutrition education", "target": 12000, "current": 6800, "unit": "mothers"}
+                    {"name": "Households reached", "target": 10000, "unit": "households"},
+                    {"name": "Food distributed (MT)", "target": 500, "unit": "metric tons"},
+                    {"name": "Beneficiary satisfaction", "target": 85, "unit": "%"}
                 ]
             },
             {
-                "title": "Girls Education Access Project - Kano State",
-                "description": "Removing barriers to girls' education through scholarship provision, community sensitization, and school infrastructure improvement. Targeting 10,000 out-of-school girls.",
-                "total_budget": 3800000,
-                "status": "active",
-                "start_date": datetime.now() - timedelta(days=90),
-                "end_date": datetime.now() + timedelta(days=270),
-                "actual_spent": 1650000,
+                "title": "Girls Education Empowerment Program",
+                "description": "Supporting 5,000 girls to complete secondary education",
+                "budget": 3500000,
+                "duration_months": 24,
+                "tasks": [
+                    {"title": "Community sensitization", "priority": "high", "type": "task", "budget": 60000},
+                    {"title": "Scholarship distribution", "priority": "high", "type": "task", "budget": 500000},
+                    {"title": "Mentorship program setup", "priority": "medium", "type": "task", "budget": 40000},
+                    {"title": "School infrastructure improvement", "priority": "high", "type": "task", "budget": 300000},
+                    {"title": "Parent engagement workshops", "priority": "medium", "type": "task", "budget": 35000},
+                    {"title": "Learning outcomes assessment", "priority": "medium", "type": "research", "budget": 45000}
+                ],
                 "kpis": [
-                    {"name": "Girls enrolled in school", "target": 10000, "current": 5200, "unit": "girls"},
-                    {"name": "Scholarships distributed", "target": 10000, "current": 5200, "unit": "scholarships"},
-                    {"name": "Schools with improved facilities", "target": 50, "current": 28, "unit": "schools"},
-                    {"name": "Community sensitization sessions", "target": 200, "current": 98, "unit": "sessions"},
-                    {"name": "Girls retention rate after 6 months", "target": 90, "current": 87, "unit": "%"}
+                    {"name": "Girls enrolled", "target": 5000, "unit": "girls"},
+                    {"name": "School attendance rate", "target": 90, "unit": "%"},
+                    {"name": "Grade completion rate", "target": 85, "unit": "%"}
                 ]
             },
             {
-                "title": "Child Protection and Psychosocial Support - IDP Camps",
-                "description": "Establishing child-friendly spaces, providing psychosocial support, and reunifying separated children with families in conflict-affected areas.",
-                "total_budget": 2950000,
-                "status": "active",
-                "start_date": datetime.now() - timedelta(days=150),
-                "end_date": datetime.now() + timedelta(days=210),
-                "actual_spent": 1350000,
+                "title": "WASH in Schools Project",
+                "description": "Providing clean water and sanitation facilities in 50 schools",
+                "budget": 1800000,
+                "duration_months": 18,
+                "tasks": [
+                    {"title": "School needs assessment", "priority": "high", "type": "research", "budget": 35000},
+                    {"title": "Borehole drilling", "priority": "high", "type": "task", "budget": 250000},
+                    {"title": "Latrine construction", "priority": "high", "type": "task", "budget": 200000},
+                    {"title": "Handwashing stations installation", "priority": "medium", "type": "task", "budget": 50000},
+                    {"title": "Hygiene education training", "priority": "high", "type": "task", "budget": 30000},
+                    {"title": "Water quality testing", "priority": "high", "type": "research", "budget": 25000}
+                ],
                 "kpis": [
-                    {"name": "Children accessing child-friendly spaces", "target": 20000, "current": 11200, "unit": "children"},
-                    {"name": "Psychosocial support sessions conducted", "target": 500, "current": 285, "unit": "sessions"},
-                    {"name": "Children reunified with families", "target": 800, "current": 420, "unit": "children"},
-                    {"name": "Case workers trained", "target": 120, "current": 78, "unit": "workers"},
-                    {"name": "Child protection committees formed", "target": 40, "current": 22, "unit": "committees"}
+                    {"name": "Schools with clean water", "target": 50, "unit": "schools"},
+                    {"name": "Students trained in hygiene", "target": 25000, "unit": "students"},
+                    {"name": "Latrine coverage", "target": 100, "unit": "%"}
                 ]
             },
             {
-                "title": "Maternal and Newborn Health - Adamawa State",
-                "description": "Strengthening primary healthcare centers, training midwives, and providing essential maternal and newborn supplies to reduce maternal mortality.",
-                "total_budget": 5100000,
-                "status": "active",
-                "start_date": datetime.now() - timedelta(days=180),
-                "end_date": datetime.now() + timedelta(days=180),
-                "actual_spent": 2350000,
+                "title": "Maternal Health Initiative",
+                "description": "Reducing maternal mortality in rural communities",
+                "budget": 4200000,
+                "duration_months": 36,
+                "tasks": [
+                    {"title": "Baseline health survey", "priority": "high", "type": "research", "budget": 55000},
+                    {"title": "Midwife training program", "priority": "high", "type": "task", "budget": 120000},
+                    {"title": "Mobile clinic deployment", "priority": "high", "type": "task", "budget": 350000},
+                    {"title": "Birth kit distribution", "priority": "medium", "type": "task", "budget": 80000},
+                    {"title": "Emergency referral system", "priority": "high", "type": "task", "budget": 60000},
+                    {"title": "Endline evaluation", "priority": "medium", "type": "research", "budget": 50000}
+                ],
                 "kpis": [
-                    {"name": "Women receiving antenatal care", "target": 25000, "current": 13500, "unit": "women"},
-                    {"name": "Skilled birth attendance", "target": 85, "current": 72, "unit": "%"},
-                    {"name": "Health facilities upgraded", "target": 30, "current": 18, "unit": "facilities"},
-                    {"name": "Midwives trained", "target": 150, "current": 85, "unit": "midwives"},
-                    {"name": "Newborn screening conducted", "target": 20000, "current": 10800, "unit": "newborns"}
+                    {"name": "Maternal mortality reduction", "target": 30, "unit": "%"},
+                    {"name": "Skilled birth attendance", "target": 80, "unit": "%"},
+                    {"name": "Antenatal care coverage", "target": 85, "unit": "%"}
                 ]
             },
             {
-                "title": "Water, Sanitation and Hygiene (WASH) - Rural Communities",
-                "description": "Constructing boreholes, promoting hygiene practices, and establishing community-led total sanitation in 100 rural communities.",
-                "total_budget": 3500000,
-                "status": "active",
-                "start_date": datetime.now() - timedelta(days=100),
-                "end_date": datetime.now() + timedelta(days=260),
-                "actual_spent": 1550000,
+                "title": "Child Protection Centers",
+                "description": "Establishing safe spaces for vulnerable children",
+                "budget": 2200000,
+                "duration_months": 24,
+                "tasks": [
+                    {"title": "Child protection mapping", "priority": "high", "type": "research", "budget": 40000},
+                    {"title": "Center construction", "priority": "high", "type": "task", "budget": 350000},
+                    {"title": "Social worker recruitment", "priority": "high", "type": "task", "budget": 60000},
+                    {"title": "Psychosocial support training", "priority": "high", "type": "task", "budget": 45000},
+                    {"title": "Case management system", "priority": "medium", "type": "task", "budget": 35000},
+                    {"title": "Community awareness campaign", "priority": "medium", "type": "task", "budget": 50000}
+                ],
                 "kpis": [
-                    {"name": "People accessing clean water", "target": 50000, "current": 28500, "unit": "people"},
-                    {"name": "Boreholes constructed", "target": 100, "current": 58, "unit": "boreholes"},
-                    {"name": "Communities certified open defecation free", "target": 80, "current": 42, "unit": "communities"},
-                    {"name": "Handwashing stations installed", "target": 500, "current": 275, "unit": "stations"},
-                    {"name": "Hygiene promoters trained", "target": 200, "current": 115, "unit": "promoters"}
+                    {"name": "Children reached", "target": 15000, "unit": "children"},
+                    {"name": "Child protection cases handled", "target": 2000, "unit": "cases"},
+                    {"name": "Community awareness events", "target": 100, "unit": "events"}
                 ]
             }
         ]
         
-        # Task templates for NGO activities
-        task_templates = [
-            {"title": "Conduct baseline assessment", "priority": "high", "type": "research", "budget": (40000, 60000), "duration": 30},
-            {"title": "Recruit project staff", "priority": "high", "type": "task", "budget": (20000, 35000), "duration": 21},
-            {"title": "Train community volunteers", "priority": "high", "type": "task", "budget": (30000, 50000), "duration": 21},
-            {"title": "Community mobilization and sensitization", "priority": "high", "type": "task", "budget": (60000, 100000), "duration": 60},
-            {"title": "Beneficiary registration and verification", "priority": "high", "type": "task", "budget": (40000, 70000), "duration": 45},
-            {"title": "Distribution of supplies and materials", "priority": "high", "type": "task", "budget": (150000, 300000), "duration": 30},
-            {"title": "Field monitoring visits", "priority": "medium", "type": "task", "budget": (30000, 50000), "duration": 90},
-            {"title": "Prepare quarterly progress report", "priority": "medium", "type": "report", "budget": (15000, 25000), "duration": 14},
-            {"title": "Conduct follow-up assessment", "priority": "high", "type": "research", "budget": (35000, 55000), "duration": 30},
-            {"title": "Document lessons learned", "priority": "low", "type": "report", "budget": (10000, 20000), "duration": 45},
-            {"title": "Submit funding request", "priority": "high", "type": "task", "budget": (5000, 15000), "duration": 14},
-            {"title": "Organize stakeholder meeting", "priority": "medium", "type": "task", "budget": (20000, 40000), "duration": 7},
-            {"title": "Update project dashboard", "priority": "low", "type": "task", "budget": (10000, 20000), "duration": 180},
-            {"title": "Conduct beneficiary satisfaction survey", "priority": "medium", "type": "research", "budget": (25000, 45000), "duration": 21},
-            {"title": "Manage budget tracking", "priority": "high", "type": "task", "budget": (15000, 30000), "duration": 180},
-            {"title": "Coordinate with local partners", "priority": "medium", "type": "task", "budget": (20000, 40000), "duration": 120},
-            {"title": "Provide technical assistance", "priority": "high", "type": "task", "budget": (50000, 80000), "duration": 90},
-            {"title": "Organize community feedback sessions", "priority": "medium", "type": "task", "budget": (15000, 30000), "duration": 30},
-            {"title": "Document success stories", "priority": "low", "type": "report", "budget": (10000, 20000), "duration": 45},
-            {"title": "Procure additional supplies", "priority": "medium", "type": "task", "budget": (100000, 200000), "duration": 21},
-            {"title": "Conduct endline evaluation", "priority": "high", "type": "research", "budget": (40000, 60000), "duration": 30},
-            {"title": "Prepare final report", "priority": "high", "type": "report", "budget": (30000, 50000), "duration": 30}
-        ]
-        
-        projects = []
+        all_projects = []
         all_tasks = []
-        all_expenses = []
         
-        for idx, pt in enumerate(project_templates, 1):
-            project = Project(
-                id=uuid.uuid4(),
-                org_id=org.id,
-                title=pt["title"],
-                description=pt["description"],
-                status=pt["status"],
-                start_date=pt["start_date"],
-                end_date=pt["end_date"],
-                total_budget=pt["total_budget"],
-                currency="USD",
-                created_by=users[0]["user"].id
-            )
-            db.add(project)
-            db.flush()
-            projects.append(project)
+        for org in organizations:
+            print(f"\n  🏢 {org.name} ({org.currency})")
             
-            bur = (pt["actual_spent"] / pt["total_budget"]) * 100
-            print(f"\n    📁 Project {idx}: {project.title[:50]}...")
-            print(f"       Budget: ${pt['total_budget']:,.0f} | Spent: ${pt['actual_spent']:,.0f} | BUR: {bur:.1f}%")
-            
-            # Add project members
-            for u in users:
+            for idx, pt in enumerate(project_templates, 1):
+                # Check if project already exists
+                existing_project = db.query(Project).filter(
+                    Project.org_id == org.id,
+                    Project.title == pt["title"]
+                ).first()
+                
+                if existing_project:
+                    print(f"    ⏭️  Already exists: {pt['title']}")
+                    continue
+                
+                start_date = datetime.now() - timedelta(days=random.randint(30, 180))
+                end_date = datetime.now() + timedelta(days=pt["duration_months"] * 30)
+                
+                project = Project(
+                    id=uuid.uuid4(),
+                    org_id=org.id,
+                    title=pt["title"],
+                    description=pt["description"],
+                    status="active",
+                    start_date=start_date,
+                    end_date=end_date,
+                    total_budget=pt["budget"],
+                    currency=org.currency,
+                    created_by=admin.id
+                )
+                db.add(project)
+                db.flush()
+                all_projects.append(project)
+                
+                print(f"    📁 Project {idx}: {project.title[:45]}...")
+                print(f"       Budget: {org.currency} {pt['budget']:,.0f}")
+                
+                # Add project members (admin only for simplicity)
                 project_member = ProjectMember(
                     id=uuid.uuid4(),
                     project_id=project.id,
-                    user_id=u["user"].id,
-                    role_id=u["role"]
+                    user_id=admin.id,
+                    role_id="owner"
                 )
                 db.add(project_member)
-            
-            # Create tasks (10-15 per project)
-            num_tasks = random.randint(10, 15)
-            selected_tasks = random.sample(task_templates, min(num_tasks, len(task_templates)))
-            task_count = 0
-            
-            for task_template in selected_tasks:
-                due_date = datetime.now() + timedelta(days=random.randint(30, 180))
-                progress = random.random()
                 
-                if progress > 0.8:
-                    status = "completed"
-                    spent_pct = 0.95
-                elif progress > 0.5:
-                    status = "in_progress"
-                    spent_pct = random.uniform(0.3, 0.7)
-                elif progress > 0.3:
-                    status = "review"
-                    spent_pct = random.uniform(0.6, 0.8)
-                else:
-                    status = "todo"
-                    spent_pct = random.uniform(0, 0.2)
-                
-                budget = random.randint(task_template["budget"][0], task_template["budget"][1])
-                spent = int(budget * spent_pct) if status != "todo" else 0
-                
-                task = Task(
-                    id=uuid.uuid4(),
-                    project_id=project.id,
-                    title=task_template["title"],
-                    description=f"Complete {task_template['title'].lower()} for {project.title}",
-                    type=task_template["type"],
-                    priority=task_template["priority"],
-                    status=status,
-                    assigned_to=random.choice([u["user"].id for u in users]) if users else None,
-                    due_date=due_date,
-                    budget_allocated=budget,
-                    total_spent=spent,
-                    created_by=users[0]["user"].id
-                )
-                db.add(task)
-                task_count += 1
-                all_tasks.append(task)
-                
-                # Add task assignee
-                assignee = TaskAssignee(
-                    id=uuid.uuid4(),
-                    task_id=task.id,
-                    user_id=task.assigned_to if task.assigned_to else users[0]["user"].id,
-                    is_supervisor=False
-                )
-                db.add(assignee)
-                
-                # Add expense if spent > 0
-                if spent > 0:
-                    expense = Expense(
+                # Create tasks
+                task_count = 0
+                for task_template in pt["tasks"]:
+                    due_date = datetime.now() + timedelta(days=random.randint(30, 180))
+                    status = random.choice(["todo", "in_progress", "review", "completed"])
+                    
+                    budget = task_template["budget"]
+                    spent = budget if status == "completed" else (budget * random.uniform(0.1, 0.5) if status == "in_progress" else 0)
+                    
+                    task = Task(
+                        id=uuid.uuid4(),
+                        project_id=project.id,
+                        title=task_template["title"],
+                        description=f"Complete {task_template['title'].lower()} for {project.title}",
+                        type=task_template["type"],
+                        priority=task_template["priority"],
+                        status=status,
+                        assigned_to=admin.id,
+                        due_date=due_date,
+                        budget_allocated=budget,
+                        total_spent=spent,
+                        created_by=admin.id
+                    )
+                    db.add(task)
+                    task_count += 1
+                    all_tasks.append(task)
+                    
+                    # Add task assignee
+                    assignee = TaskAssignee(
                         id=uuid.uuid4(),
                         task_id=task.id,
-                        user_id=users[0]["user"].id,
-                        amount=spent,
-                        payment_method=random.choice(["bank_transfer", "cash", "bank_transfer"]),
-                        category=random.choice(["materials", "travel", "labor", "equipment", "training"]),
-                        description=f"Expenses for {task_template['title'].lower()}",
-                        status="approved",
-                        approved_by=users[0]["user"].id,
-                        approved_at=datetime.now()
+                        user_id=admin.id,
+                        is_supervisor=False
                     )
-                    db.add(expense)
-                    all_expenses.append(expense)
-            
-            print(f"       ✅ Created {task_count} tasks with expenses")
-            
-            # Create KPIs
-            kpi_count = 0
-            for kpi_template in pt["kpis"]:
-                period_start = datetime.now() - timedelta(days=random.randint(30, 90))
-                period_end = datetime.now() + timedelta(days=random.randint(30, 180))
-                current = kpi_template["current"]
-                target = kpi_template["target"]
-                kar = (current / target) * 100
+                    db.add(assignee)
+                    
+                    # Add expense if spent > 0
+                    if spent > 0:
+                        expense = Expense(
+                            id=uuid.uuid4(),
+                            task_id=task.id,
+                            user_id=admin.id,
+                            amount=spent,
+                            payment_method=random.choice(["bank_transfer", "cash"]),
+                            category=random.choice(["materials", "travel", "labor", "equipment"]),
+                            description=f"Expenses for {task_template['title'].lower()}",
+                            status="approved",
+                            approved_by=admin.id,
+                            approved_at=datetime.now()
+                        )
+                        db.add(expense)
                 
-                # Determine status based on KAR
-                if kar >= 100:
-                    status = "good"
-                elif kar >= 75:
-                    status = "satisfactory"
-                    status = "warning"
-                    status = "critical"
-                elif kar >= 50:
-                    status = "warning"
-                else:
-                    status = "critical"
+                print(f"       ✅ Created {task_count} tasks")
                 
-                kpi = KPI(
-                    id=uuid.uuid4(),
-                    project_id=project.id,
-                    created_by=users[0]["user"].id,
-                    indicator_name=kpi_template["name"],
-                    description=f"Track {kpi_template['name'].lower()} for {project.title}",
-                    target_value=target,
-                    actual_value=current,
-                    kar=kar,
-                    status=status,
-                    unit=kpi_template["unit"],
-                    period_start=period_start,
-                    period_end=period_end
-                )
-                db.add(kpi)
-                kpi_count += 1
-            
-            print(f"       📊 Created {kpi_count} KPIs")
+                # Create KPIs
+                kpi_count = 0
+                for kpi_template in pt["kpis"]:
+                    period_start = datetime.now() - timedelta(days=random.randint(30, 90))
+                    period_end = datetime.now() + timedelta(days=random.randint(30, 180))
+                    actual = random.randint(int(kpi_template["target"] * 0.3), kpi_template["target"])
+                    kar = (actual / kpi_template["target"]) * 100
+                    
+                    if kar >= 75:
+                        status = "satisfactory"
+                    elif kar >= 50:
+                        status = "warning"
+                    else:
+                        status = "critical"
+                    
+                    kpi = KPI(
+                        id=uuid.uuid4(),
+                        project_id=project.id,
+                        created_by=admin.id,
+                        indicator_name=kpi_template["name"],
+                        description=f"Track {kpi_template['name'].lower()} for {project.title}",
+                        target_value=kpi_template["target"],
+                        actual_value=actual,
+                        kar=kar,
+                        status=status,
+                        unit=kpi_template["unit"],
+                        period_start=period_start,
+                        period_end=period_end
+                    )
+                    db.add(kpi)
+                    kpi_count += 1
+                
+                print(f"       📊 Created {kpi_count} KPIs")
         
         # ============================================================
-        # STEP 5: CREATE COMMENTS
-        # ============================================================
-        print("\n[5] Creating Comments...")
-        comment_count = 0
-        comment_templates = [
-            "Great progress on this task!",
-            "Need additional support from the team.",
-            "Completed ahead of schedule.",
-            "Waiting for approval from the donor.",
-            "Community feedback is very positive.",
-            "Experiencing delays due to weather.",
-            "All beneficiaries have been registered.",
-            "Training materials have been distributed.",
-            "Monthly report submitted to the coordinator.",
-            "Working with local partners on this activity."
-        ]
-        
-        for task in all_tasks[:30]:  # Add comments to first 30 tasks
-            num_comments = random.randint(1, 3)
-            for _ in range(num_comments):
-                comment = Comment(
-                    id=uuid.uuid4(),
-                    task_id=task.id,
-                    user_id=task.assigned_to if task.assigned_to else users[0]["user"].id,
-                    body=random.choice(comment_templates),
-                    created_at=datetime.now() - timedelta(days=random.randint(1, 30))
-                )
-                db.add(comment)
-                comment_count += 1
-        
-        print(f"    ✅ Created {comment_count} comments")
-        
-        # ============================================================
-        # STEP 6: CREATE NOTIFICATIONS
-        # ============================================================
-        print("\n[6] Creating Notifications...")
-        notification_count = 0
-        notification_templates = [
-            ("task_assigned", "New Task Assigned", "You have been assigned a new task"),
-            ("task_status_change", "Task Status Updated", "A task status has been changed"),
-            ("expense_approved", "Expense Approved", "Your expense has been approved"),
-            ("kpi_warning", "KPI Warning", "A KPI is below the target threshold"),
-            ("bur_alert", "Budget Alert", "Budget utilization has reached 80%")
-        ]
-        
-        for user_data in users[:5]:  # Notify first 5 users
-            num_notifications = random.randint(3, 6)
-            for _ in range(num_notifications):
-                ntype, title, message = random.choice(notification_templates)
-                notification = Notification(
-                    id=uuid.uuid4(),
-                    user_id=user_data["user"].id,
-                    org_id=org.id,
-                    type=ntype,
-                    title=title,
-                    message=message,
-                    is_read=random.choice([True, False]),
-                    created_at=datetime.now() - timedelta(days=random.randint(1, 14))
-                )
-                db.add(notification)
-                notification_count += 1
-        
-        print(f"    ✅ Created {notification_count} notifications")
-        
-        # ============================================================
-        # STEP 7: COMMIT ALL CHANGES
+        # STEP 4: COMMIT ALL CHANGES
         # ============================================================
         db.commit()
         
@@ -442,70 +387,45 @@ def seed_save_the_children():
         print("SEEDING COMPLETE - SUMMARY")
         print("=" * 80)
         
-        total_budget = sum(p.total_budget for p in projects)
-        total_spent = sum(e.amount for e in all_expenses)
-        total_tasks = len(all_tasks)
-        completed_tasks = len([t for t in all_tasks if t.status == "completed"])
-        in_progress_tasks = len([t for t in all_tasks if t.status == "in_progress"])
+        total_budget = sum(p.total_budget for p in all_projects)
+        total_spent = sum(t.total_spent or 0 for t in all_tasks)
         
-        print(f"\n🏢 ORGANIZATION:")
-        print(f"   Name: {org.name}")
-        print(f"   ID: {org.id}")
-        print(f"   Team Members: {len(users)}")
+        print(f"\n🏢 ORGANIZATIONS:")
+        for org in organizations:
+            org_projects = [p for p in all_projects if p.org_id == org.id]
+            org_tasks = [t for t in all_tasks if any(p.id == t.project_id for p in org_projects)]
+            print(f"   • {org.name}: {len(org_projects)} projects, {len(org_tasks)} tasks")
         
-        print(f"\n📁 PROJECTS:")
-        print(f"   Total Projects: {len(projects)}")
+        print(f"\n📊 TOTALS:")
+        print(f"   Organizations: {len(organizations)}")
+        print(f"   Projects: {len(all_projects)}")
+        print(f"   Tasks: {len(all_tasks)}")
         print(f"   Total Budget: ${total_budget:,.0f}")
         print(f"   Total Spent: ${total_spent:,.0f}")
         print(f"   Overall BUR: {(total_spent/total_budget*100):.1f}%")
         
-        print(f"\n✅ TASKS:")
-        print(f"   Total Tasks: {total_tasks}")
-        print(f"   Completed: {completed_tasks}")
-        print(f"   In Progress: {in_progress_tasks}")
-        print(f"   Completion Rate: {(completed_tasks/total_tasks*100):.1f}%")
-        
-        print(f"\n💰 FINANCES:")
-        print(f"   Total Expenses: {len(all_expenses)}")
-        print(f"   Total Amount: ${total_spent:,.0f}")
-        
-        print(f"\n📊 KPIs:")
-        print(f"   Total KPIs: {sum(len(p['kpis']) for p in project_templates)}")
-        
-        print(f"\n💬 ACTIVITIES:")
-        print(f"   Comments: {comment_count}")
-        print(f"   Notifications: {notification_count}")
-        
-        # Project breakdown
-        print(f"\n📋 PROJECT BREAKDOWN:")
-        for i, project in enumerate(projects):
-            project_tasks = [t for t in all_tasks if t.project_id == project.id]
-            project_spent = sum(t.total_spent or 0 for t in project_tasks)
-            bur = (project_spent / project.total_budget) * 100 if project.total_budget > 0 else 0
-            status_icon = "🔴" if bur >= 100 else "🟡" if bur >= 80 else "🟢"
-            print(f"   {status_icon} {project.title[:45]}... | BUR: {bur:.1f}% | Tasks: {len(project_tasks)}")
-        
         print("\n" + "=" * 80)
-        print("🎉 SEEDING COMPLETE! Data is ready for the frontend.")
+        print("🎉 ALL NGOs SEEDED SUCCESSFULLY!")
         print("=" * 80)
         
         # Save IDs to file
-        with open("supabase_seeded_data.txt", "w") as f:
-            f.write("=== SUPABASE SEEDED DATA IDs ===\n\n")
-            f.write(f"ORGANIZATION:\n")
-            f.write(f"  Name: {org.name}\n")
-            f.write(f"  ID: {org.id}\n\n")
-            f.write("PROJECTS:\n")
-            for project in projects:
+        with open("all_ngos_seeded_data.txt", "w") as f:
+            f.write("=== ALL NGOs SEEDED DATA IDs ===\n\n")
+            f.write("ORGANIZATIONS:\n")
+            for org in organizations:
+                f.write(f"  {org.name}: {org.id}\n")
+            f.write(f"\nPROJECTS:\n")
+            for project in all_projects[:10]:
                 f.write(f"  {project.title}: {project.id}\n")
+            f.write(f"\nTotal Projects: {len(all_projects)}\n")
+            f.write(f"Total Tasks: {len(all_tasks)}\n")
         
-        print(f"\n💾 Data IDs saved to: supabase_seeded_data.txt")
+        print(f"\n💾 Data IDs saved to: all_ngos_seeded_data.txt")
         
         return {
-            "organization": org,
-            "projects": projects,
-            "tasks": all_tasks,
-            "users": users
+            "organizations": organizations,
+            "projects": all_projects,
+            "tasks": all_tasks
         }
         
     except Exception as e:
@@ -520,4 +440,4 @@ def seed_save_the_children():
 
 if __name__ == "__main__":
     create_tables()
-    seed_save_the_children()
+    seed_all_ngos()

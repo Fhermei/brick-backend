@@ -1,0 +1,23 @@
+=== ALL NGOs SEEDED DATA IDs ===
+
+ORGANIZATIONS:
+  International Rescue Committee Nigeria: dccd0e58-35af-4716-bbed-1d89fd4b5ca3
+  CARE International Nigeria: 88b2b190-a77a-47fd-b4de-2b110141317b
+  Oxfam Nigeria: b889e612-b876-4ca7-9e49-e54e8137ac32
+  Plan International Nigeria: ce3a167d-8602-4632-95cd-8b320ccdc4e1
+  ActionAid Nigeria: 3ea0037d-3e8e-4199-b92e-d3b82ee20e74
+
+PROJECTS:
+  Emergency Food Security Response: 0d579382-6a94-4577-9e3d-01dba7d27512
+  Girls Education Empowerment Program: 8bcad8b2-36c6-4625-a039-a2a38d736598
+  WASH in Schools Project: 6cc04d93-d622-4f35-8d36-d7605f8d4201
+  Maternal Health Initiative: 5d7870e8-0d55-41ca-8802-0ec51c96b6f9
+  Child Protection Centers: 40b4575a-f9df-401a-a76f-83ea5cb99100
+  Emergency Food Security Response: 824f1d52-3398-4478-ad1d-9119f1b0472a
+  Girls Education Empowerment Program: 93d4cf9d-7a66-473c-94d4-fbb4c6051448
+  WASH in Schools Project: 052bcc0f-a16f-4f5b-b1b0-801e42aeb0b3
+  Maternal Health Initiative: 8b40586d-5764-49b6-8386-6e73c6d391c0
+  Child Protection Centers: 6249524f-8f03-4edf-99ef-6a68bfa73e12
+
+Total Projects: 25
+Total Tasks: 150
