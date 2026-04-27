@@ -266,29 +266,32 @@ def login(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=is_production,
-        samesite="lax",
+        secure=True,  # Must be True for HTTPS (Vercel uses HTTPS)
+        samesite="none",  # Required for cross-domain cookies
         max_age=3600,
         path="/",
+        domain=".vercel.app"  # Allow across all vercel.app subdomains
     )
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=is_production,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=60 * 60 * 24 * 30,
         path="/",
+        domain=".vercel.app"
     )
     if cognito_sub:
         response.set_cookie(
             key="user_cognito_sub",
             value=cognito_sub,
             httponly=True,
-            secure=is_production,
-            samesite="lax",
+            secure=True,
+            samesite="none",
             max_age=60 * 60 * 24 * 30,
             path="/",
+            domain=".vercel.app"
         )
 
     return LoginResponse(

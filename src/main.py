@@ -27,13 +27,12 @@ app.add_middleware(
         "https://brick-frontend-git-main-femis-projects-21e38439.vercel.app",
         "https://brick-frontend-*.vercel.app",
     ],
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
-    expose_headers=["*"],
+    allow_credentials=True,  # Must be True for cookies
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Set-Cookie", "Cookie"],
     max_age=86400,
 )
-
 
 @app.on_event("startup")
 def on_startup():
