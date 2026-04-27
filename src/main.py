@@ -20,7 +20,12 @@ app = FastAPI(
 # Configure CORS properly for all endpoints including reports
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://brick-frontend-beige.vercel.app",
+        "https://brick-frontend-1d3rb52bw-femis-projects-21e38439.vercel.app",
+    ], 
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=[
