@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
@@ -17,8 +17,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS configuration for Render and Vercel
-# Allow all origins for now to test (you can restrict later)
+# CORS configuration - THIS MUST BE FIRST
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -27,11 +26,10 @@ app.add_middleware(
         "https://brick-frontend-*.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://brick-backend.onrender.com",
     ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
     expose_headers=["*"],
     max_age=86400,
 )
@@ -50,7 +48,7 @@ def on_startup():
     
     # Log Redis status
     if settings.REDIS_URL:
-        logger.info(f"Redis configured with URL: {settings.REDIS_URL}")
+        logger.info(f"Redis configured")
     else:
         logger.info("Redis not configured - continuing without Redis")
 
@@ -75,15 +73,35 @@ def health_check():
     }
 
 
+# CRITICAL FIX: Handle OPTIONS requests for all paths
+@app.api_route("/{path:path}", methods=["OPTIONS"])
+async def options_handler(request: Request, path: str):
+    """Handle CORS preflight requests for all paths"""
+    response = Response(status_code=200)
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "86400"
+    return response
+
+
+# Also handle OPTIONS for the specific API v1 paths
+@app.api_route("/api/v1/{path:path}", methods=["OPTIONS"])
+async def options_api_handler(request: Request, path: str):
+    """Handle CORS preflight requests for API v1 paths"""
+    response = Response(status_code=200)
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "86400"
+    return response
+
+
 @app.options("/{rest_of_path:path}")
 async def preflight_handler():
-    """Handle CORS preflight requests"""
-    response = Response(status_code=200)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
+    return Response(status_code=200)
 
 
 app.include_router(v1_router, prefix="/api/v1")

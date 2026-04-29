@@ -2,7 +2,7 @@
 v1 API router — mounts all endpoint sub-routers.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Response
 
 from src.api.v1.endpoints.auth import router as auth_router
 from src.api.v1.endpoints.organizations import router as org_router
@@ -18,7 +18,6 @@ from src.api.v1.endpoints.budget import router as budget_router
 from src.api.v1.endpoints.kpis import router as kpis_router
 from src.api.v1.endpoints.reports import router as reports_router
 from src.api.v1.endpoints.audit import router as audit_router
-from src.api.v1.endpoints.expenses import router as expenses_router
 
 router = APIRouter()
 
@@ -26,6 +25,33 @@ router = APIRouter()
 @router.get("/health", tags=["Health"])
 def health_check():
     return {"status": "ok", "message": "Brick API is alive"}
+
+
+# CORS OPTIONS handler for all routes in this router
+@router.api_route("/{path:path}", methods=["OPTIONS"])
+async def options_handler(request: Request, path: str):
+    """Handle CORS preflight requests for all API v1 paths"""
+    response = Response(status_code=200)
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "86400"
+    return response
+
+
+# Specific OPTIONS handler for auth paths
+@router.api_route("/auth/{path:path}", methods=["OPTIONS"])
+async def options_auth_handler(request: Request, path: str):
+    """Handle CORS preflight requests for auth paths"""
+    response = Response(status_code=200)
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "86400"
+    return response
+
 
 # Mount all routers
 router.include_router(auth_router, prefix="/auth", tags=["Auth"])
@@ -42,4 +68,3 @@ router.include_router(budget_router, prefix="/budget", tags=["Budget"])
 router.include_router(kpis_router, prefix="/kpis", tags=["KPIs"])
 router.include_router(reports_router, prefix="/reports", tags=["Reports"])
 router.include_router(audit_router, prefix="/audit", tags=["Audit"])
-router.include_router(expenses_router, prefix="/expenses", tags=["Expenses"])
