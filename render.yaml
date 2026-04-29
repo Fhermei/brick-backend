@@ -6,67 +6,48 @@ services:
     branch: main
     plan: free
     region: oregon
-    pythonVersion: 3.11.11
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn src.main:app --host 0.0.0.0 --port 10000
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
       - key: APP_NAME
-        sync: false
         value: Brick SPMES API
       - key: APP_VERSION
-        sync: false
         value: 1.0.0
       - key: DEBUG
-        sync: false
         value: False
       - key: DATABASE_URL
-        sync: false
         value: postgresql://postgres.fsqcwiylxboofkgtvfez:Fatunbi1111.@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
       - key: REDIS_URL
-        sync: false
         value: redis://localhost:6379
       - key: AWS_REGION
-        sync: false
         value: us-east-1
       - key: COGNITO_CLIENT_ID
-        sync: false
         value: 6ioalvaggduenre0roa6uv9ef9
       - key: COGNITO_CLIENT_SECRET
-        sync: false
         value: 1viv7no673ffi866mv722mmr0nhnfsrvqsett6rlj13ago8miqed
       - key: COGNITO_USER_POOL_ID
-        sync: false
         value: us-east-1_ZZpd60SXD
       - key: SMTP_HOST
-        sync: false
         value: smtp.gmail.com
       - key: SMTP_PORT
-        sync: false
         value: 587
       - key: SMTP_USER
-        sync: false
         value: fhermei2@gmail.com
       - key: SMTP_PASSWORD
-        sync: false
         value: gtywediovyvpauvs
       - key: SMTP_FROM_EMAIL
-        sync: false
         value: noreply@brickapp.com
       - key: SMTP_USE_TLS
-        sync: false
         value: True
       - key: FRONTEND_URL
-        sync: false
         value: https://brick-frontend-beige.vercel.app
       - key: ALLOWED_ORIGINS
-        sync: false
         value: https://brick-frontend-beige.vercel.app,http://localhost:5173
       - key: POSTGRES_DB
-        sync: false
         value: postgres
       - key: POSTGRES_USER
-        sync: false
         value: postgres.fsqcwiylxboofkgtvfez
       - key: POSTGRES_PASSWORD
-        sync: false
         value: Fatunbi1111.
