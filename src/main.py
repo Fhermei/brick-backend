@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.config import settings
@@ -17,7 +17,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS configuration - MUST be before routes
+# CORS configuration for Render and Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -26,13 +26,15 @@ app.add_middleware(
         "https://brick-frontend-beige.vercel.app",
         "https://brick-frontend-git-main-femis-projects-21e38439.vercel.app",
         "https://brick-frontend-*.vercel.app",
+        "https://brick-backend.onrender.com",
     ],
-    allow_credentials=True,  # Must be True for cookies
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Set-Cookie", "Cookie"],
     max_age=86400,
 )
+
 
 @app.on_event("startup")
 def on_startup():
@@ -48,7 +50,7 @@ def root():
     }
 
 
-@app.options("/{rest_of_path:path}")  # Handle preflight requests
+@app.options("/{rest_of_path:path}")
 async def preflight_handler():
     return Response(status_code=200)
 
