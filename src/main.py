@@ -18,13 +18,21 @@ app = FastAPI(
 )
 
 # CORS configuration for Render and Vercel
+# Allow all origins for now to test (you can restrict later)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=[
+        "https://brick-frontend-beige.vercel.app",
+        "https://brick-frontend-git-main-femis-projects-21e38439.vercel.app",
+        "https://brick-frontend-*.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://brick-backend.onrender.com",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Set-Cookie", "Cookie"],
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],
     max_age=86400,
 )
 
@@ -69,7 +77,13 @@ def health_check():
 
 @app.options("/{rest_of_path:path}")
 async def preflight_handler():
-    return Response(status_code=200)
+    """Handle CORS preflight requests"""
+    response = Response(status_code=200)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 
 app.include_router(v1_router, prefix="/api/v1")
