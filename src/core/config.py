@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "brick"
     POSTGRES_PASSWORD: str = "Fatunbi11."
 
-    # Redis
-    REDIS_URL: str
+    # Redis - Made optional with default None
+    REDIS_URL: Optional[str] = None
 
     # AWS Cognito
     AWS_REGION: str
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173,https://brick-frontend-beige.vercel.app"
 
     @property
     def allowed_origins_list(self) -> List[str]:
@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # This ignores extra environment variables
 
 
 settings = Settings()

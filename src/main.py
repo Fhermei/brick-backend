@@ -20,14 +20,7 @@ app = FastAPI(
 # CORS configuration for Render and Vercel
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://brick-frontend-beige.vercel.app",
-        "https://brick-frontend-git-main-femis-projects-21e38439.vercel.app",
-        "https://brick-frontend-*.vercel.app",
-        "https://brick-backend.onrender.com",
-    ],
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,6 +39,12 @@ def on_startup():
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
         logger.warning("Continuing without database - check DATABASE_URL")
+    
+    # Log Redis status
+    if settings.REDIS_URL:
+        logger.info(f"Redis configured with URL: {settings.REDIS_URL}")
+    else:
+        logger.info("Redis not configured - continuing without Redis")
 
 
 @app.get("/")
@@ -54,12 +53,18 @@ def root():
         "message": "Welcome to Brick SPMES API",
         "version": settings.APP_VERSION,
         "docs": "/docs",
+        "environment": "production" if not settings.DEBUG else "development"
     }
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "port": os.getenv("PORT", "10000")}
+    return {
+        "status": "ok", 
+        "port": os.getenv("PORT", "10000"),
+        "redis_enabled": bool(settings.REDIS_URL),
+        "database_configured": bool(settings.DATABASE_URL)
+    }
 
 
 @app.options("/{rest_of_path:path}")
@@ -69,7 +74,8 @@ async def preflight_handler():
 
 app.include_router(v1_router, prefix="/api/v1")
 
-# This is important for Render - make sure the app is properly configured
+
+# This is critical for Render - use the PORT environment variable
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", "10000"))

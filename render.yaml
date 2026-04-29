@@ -7,7 +7,7 @@ services:
     plan: free
     region: oregon
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.main:app --host 0.0.0.0 --port 10000 --reload
+    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.10
@@ -19,8 +19,7 @@ services:
         value: false
       - key: DATABASE_URL
         value: postgresql://postgres.fsqcwiylxboofkgtvfez:Fatunbi1111.@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require
-      - key: REDIS_URL
-        value: redis://dummy:6379  # Add this - it's required by your config
+      # REDIS_URL is now optional - no need to set it
       - key: AWS_REGION
         value: us-east-1
       - key: COGNITO_CLIENT_ID
@@ -44,4 +43,4 @@ services:
       - key: FRONTEND_URL
         value: https://brick-frontend-beige.vercel.app
       - key: ALLOWED_ORIGINS
-        value: https://brick-frontend-beige.vercel.app,http://localhost:5173
+        value: https://brick-frontend-beige.vercel.app,http://localhost:5173,http://localhost:3000
